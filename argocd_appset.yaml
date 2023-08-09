@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: guestbook
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: dev
+        url: https://1.2.3.4
+      - cluster: prod
+        url: https://2.4.6.8
+      - cluster: qa
+        url: https://9.8.7.6
+  template:
+    metadata:
+      name: '{{cluster}}-guestbook'
+      annotations:
+        notifications.argoproj.io/subscriptions: |
+          - trigger: [on-sync-succeeded,on-deployed]
+            destinations:
+              - service: slack
+                recipients: [argocdreleasenotes]
+          - trigger: [on-health-degraded, on-sync-failed]
+            destinations:
+              - service: slack
+                recipients: [argocdreleasefailures]
+    spec:
+      project: my-project
+      source:
+        repoURL: https://github.com/infra-team/cluster-deployments.git
+        targetRevision: HEAD
+        path: guestbook/{{cluster}}
+      destination:
+        server: '{{url}}'
+        namespace: guestbook
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

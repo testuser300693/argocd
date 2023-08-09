@@ -7,14 +7,14 @@ metadata:
   #   notifications.argoproj.io/subscribe.on-sync-succeeded.slack: my_channel
   annotations:
     notifications.argoproj.io/subscriptions: |
-      - trigger: [on-scaling-replica-set, on-rollout-updated, on-rollout-step-completed]
+      - trigger: [on-sync-succeeded,on-deployed]
         destinations:
           - service: slack
-            recipients: [my-channel-1, my-channel-2]
-      - trigger: [on-rollout-aborted, on-analysis-run-failed, on-analysis-run-error]
+            recipients: [argocdreleasenotes]
+      - trigger: [on-health-degraded, on-sync-failed]
         destinations:
           - service: slack
-            recipients: [my-channel-21, my-channel-22]
+            recipients: [argocdreleasefailures]
 spec:
   project: default
   source:
