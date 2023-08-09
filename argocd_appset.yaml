@@ -15,16 +15,16 @@ spec:
   template:
     metadata:
       name: '{{cluster}}-guestbook'
-      annotations:
-        notifications.argoproj.io/subscriptions: |
-          - trigger: [on-sync-succeeded,on-deployed]
-            destinations:
-              - service: slack
-                recipients: [argocdreleasenotes]
-          - trigger: [on-health-degraded, on-sync-failed]
-            destinations:
-              - service: slack
-                recipients: [argocdreleasefailures]
+      # annotations:
+      #   notifications.argoproj.io/subscriptions: |
+      #     - trigger: [on-sync-succeeded,on-deployed]
+      #       destinations:
+      #         - service: slack
+      #           recipients: [argocdreleasenotes]
+      #     - trigger: [on-health-degraded, on-sync-failed]
+      #       destinations:
+      #         - service: slack
+      #           recipients: [argocdreleasefailures]
     spec:
       project: my-project
       source:

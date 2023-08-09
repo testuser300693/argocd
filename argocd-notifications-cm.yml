@@ -3,13 +3,36 @@
   metadata:
     name: <config-map-name>
   data:
+    subscriptions: |
+      - recipients:
+        - slack:argocdreleasenotes
+        triggers:
+        - on-sync-succeeded
+        - on-deployed
+      - recipients:
+        - slack:argocdreleasefailures
+        triggers:
+        - on-health-degraded
+        - on-sync-failed
     template.app-sync-status: |
       message: |
         Application {{.app.metadata.name}} has been successfully synced at {{.app.status.operationState.finishedAt}}.
         Sync operation details are available at: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true .
+        Author: {{(call .repo.GetCommitMetadata .app.status.sync.revision).Author}}"
     template.app-deployed: |
       message: |
-        Application {{.app.metadata.name}} is now running new version of deployments manifests.
+        Application {{.app.metadata.name}} is now running new version of deplyments manifests.
+        Author: {{(call .repo.GetCommitMetadata .app.status.sync.revision).Author}}"
+    template.app-health-degraded: |
+      message: |
+        Application {{.app.metadata.name}} has degraded.
+        Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
+        Author: {{(call .repo.GetCommitMetadata .app.status.sync.revision).Author}}"
+    template.app-sync-failed: |
+      message: |
+        The sync operation of application {{.app.metadata.name}} has failed at {{.app.status.operationState.finishedAt}} with the following error: {{.app.status.operationState.message}}
+        Sync operation details are available at: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true .
+        Author: {{(call .repo.GetCommitMetadata .app.status.sync.revision).Author}}"
     trigger.on-sync-succeeded: |
       - when: app.status.sync.status == "Succeeded"
         oncePer: app.status.sync.revision
@@ -18,3 +41,11 @@
       - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
         oncePer: app.status.sync.revision
         send: [app-deployed]
+    trigger.on-health-degraded: |
+      - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+        oncePer: app.status.sync.revision
+        send: [app-health-degraded]
+    trigger.on-sync-failed: |
+      - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+        oncePer: app.status.sync.revision
+        send: [app-sync-failed]
