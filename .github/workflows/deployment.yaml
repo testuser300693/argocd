@@ -1,0 +1,25 @@
+name: Build and Deployment
+on: 
+    pull_request:
+        types: [opened, reopened]
+#         branches:
+#             - 'main'
+#             - 'main*'
+    # workflow_dispatch:
+jobs:
+  raisepr:
+    name: Raise PR to main branch
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+        - name: update namespace
+          run: |
+            export NAMESPACE=staging
+            export SERVER=https://kubernetes.default.svc
+            kubectl config use-context $PROJECT_NAME-staging 
+            cat argocd/argocd-app.yaml | envsubst | kubectl apply -f -
+        - name: create PR
+          #run: gh pr create -B main -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+          run: gh pr create -B deploy --title 'Merge feature into deploy branch' --body 'Created by Github action'
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

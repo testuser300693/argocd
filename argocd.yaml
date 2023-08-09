@@ -11,8 +11,6 @@ metadata:
         destinations:
           - service: slack
             recipients: [my-channel-1, my-channel-2]
-          - service: email
-            recipients: [recipient-1, recipient-2, recipient-3 ]
       - trigger: [on-rollout-aborted, on-analysis-run-failed, on-analysis-run-error]
         destinations:
           - service: slack
@@ -21,7 +19,7 @@ spec:
   project: default
   source:
     repoURL: ${GIT_REPO}
-    targetRevision: HEAD
+    targetRevision: deploy
     path: argocd/env/${NAMESPACE}
   destination: 
     server: ${SERVER}

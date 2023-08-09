@@ -3,5 +3,7 @@
   metadata:
     name: <config-map-name>
   data:
-    service.slack: |
-      token: $slack-token
+    template.my-custom-template-slack-template: |
+      message: |
+        Application {{.app.metadata.name}} sync is {{.app.status.sync.status}}.
+        Application details: {{.context.argocdUrl}}/applications/{{.app.metadata.name}}.
