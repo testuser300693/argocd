@@ -1,18 +1,24 @@
   apiVersion: v1
   kind: ConfigMap
   metadata:
-    name: <config-map-name>
+    name:  argocd-notifications-cm
   data:
     subscriptions: |
       - recipients:
         - slack:argocdreleasenotes
         triggers:
         - on-sync-succeeded
+      - recipients:
+        - slack:argocdreleasenotes
+        triggers:
         - on-deployed
       - recipients:
         - slack:argocdreleasefailures
         triggers:
         - on-health-degraded
+      - recipients:
+        - slack:argocdreleasefailures
+        triggers:
         - on-sync-failed
     template.app-sync-status: |
       message: |
