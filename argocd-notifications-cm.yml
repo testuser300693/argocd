@@ -3,6 +3,8 @@
   metadata:
     name:  argocd-notifications-cm
   data:
+    service.slack: |
+      token: $slack-token
     subscriptions: |
       - recipients:
         - slack:argocdreleasenotes
