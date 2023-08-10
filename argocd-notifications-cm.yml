@@ -42,10 +42,10 @@
         oncePer: app.status.sync.revision
         send: [app-deployed]
     trigger.on-health-degraded: |
-      - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+      - when: app.status.health.status == 'Degraded'
         oncePer: app.status.sync.revision
         send: [app-health-degraded]
     trigger.on-sync-failed: |
-      - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+      - when: app.status.operationState.phase in ['Error', 'Failed']
         oncePer: app.status.sync.revision
         send: [app-sync-failed]
